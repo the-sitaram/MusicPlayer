@@ -1,24 +1,24 @@
-FROM python:3.9-slim-buster
+# ✅ Use a supported base image (buster replaced with bookworm)
+FROM python:3.9-slim-bookworm
 
-# Updating Packages
-RUN apt update && apt upgrade -y
-RUN apt install git curl python3-pip ffmpeg -y
+# 🧩 Update and install required packages
+RUN apt update && apt upgrade -y && \
+    apt install -y git curl ffmpeg python3-pip && \
+    apt clean && rm -rf /var/lib/apt/lists/*
 
-# Copying Requirements
+# 📦 Copy and install Python requirements
 COPY requirements.txt /requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -U -r /requirements.txt
 
-# Installing Requirements
-RUN cd /
-RUN pip3 install --upgrade pip
-RUN pip3 install -U -r requirements.txt
-
-# Setting up working directory
-RUN mkdir /MusicPlayer
+# 📁 Set working directory
 WORKDIR /MusicPlayer
 
-# Preparing for the Startup
-COPY startup.sh /startup.sh
-RUN chmod +x /startup.sh
+# 🚀 Copy project files
+COPY . .
 
-# Running Music Player Bot
-CMD ["/bin/bash", "/startup.sh"]
+# 🏁 Make startup script executable
+RUN chmod +x /MusicPlayer/startup.sh
+
+# ▶️ Run the bot
+CMD ["/bin/bash", "/MusicPlayer/startup.sh"]
